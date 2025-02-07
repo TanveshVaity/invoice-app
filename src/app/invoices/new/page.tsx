@@ -3,22 +3,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-import { sql } from "drizzle-orm"
-import { db } from "@/db";
+import { createAction } from "@/app/actions";
 
 export default async function New() {
-    const result  = await db.execute(sql`SELECT current_database()`);
+
     return (
         <main className="flex flex-col justify-center text-left gap-6 max-w-5xl mx-auto my-12">
             <div className="flex justify-between  w-full">
                 <h1 className="text-3xl font-semibold">
-                    Create Invoices
+                    Create Invoice
                 </h1>
             </div>
 
-            <p>{JSON.stringify(result)}</p>
-
-            <form className="grid gap-6 max-w-xs">
+            <form action={createAction} className="grid gap-6 max-w-xs">
                 <div>
                     <Label htmlFor="name" className="block font-semibold text-small mb-2 ">Billing Name</Label>
                     <Input id="name" name="name" type="text" />
