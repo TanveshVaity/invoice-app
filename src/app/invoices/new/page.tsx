@@ -1,11 +1,24 @@
-import { Button } from "@/components/ui/button";
+"use client"
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import SubmitButton from "@/components/SubmitButton";
+import Form from "next/form";
 
 import { createAction } from "@/app/actions";
+import { SyntheticEvent, useState } from "react";
 
-export default async function New() {
+
+export default function New() {
+    const [state, setState] = useState("ready");
+    const handleSubmit = async (event : SyntheticEvent) => {
+        if(state === "pending"){
+            event.preventDefault();
+            return;
+        } 
+        setState("pending");
+    }
 
     return (
         <main className="flex flex-col justify-center text-left gap-6 max-w-5xl mx-auto my-12">
@@ -15,7 +28,7 @@ export default async function New() {
                 </h1>
             </div>
 
-            <form action={createAction} className="grid gap-6 max-w-xs">
+            <Form action={createAction} onSubmit={handleSubmit} className="grid gap-6 max-w-xs">
                 <div>
                     <Label htmlFor="name" className="block font-semibold text-small mb-2 ">Billing Name</Label>
                     <Input id="name" name="name" type="text" />
@@ -33,11 +46,9 @@ export default async function New() {
                     <Textarea id="description" name="description"/>
                 </div>
                 <div>
-                    <Button className="w-full font-semibold" type="submit">
-                        Submit
-                    </Button>
+                    <SubmitButton />
                 </div>
-            </form>
+            </Form>
         </main>
     );
 }
