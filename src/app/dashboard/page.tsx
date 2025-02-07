@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { CirclePlus } from 'lucide-react';
 import Link from "next/link";
 
-export default function Home() {
+export default function Dashboard() {
     return (
         <main className="flex flex-col items-center justify-center text-center gap-6 max-w-5xl mx-auto my-12">
             <div className="flex justify-between  w-full">
