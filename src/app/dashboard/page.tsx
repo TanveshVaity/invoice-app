@@ -13,6 +13,7 @@ import { CirclePlus } from 'lucide-react';
 import Link from "next/link";
 import { db } from "@/db";
 import { Invoices } from "@/db/schema";
+import { cn } from "@/lib/utils";
 
 export default async function Dashboard() {
     const invoices = await db.select().from(Invoices);
@@ -72,7 +73,13 @@ export default async function Dashboard() {
                                 </TableCell>
                                 <TableCell className="text-center p-0">
                                     <Link href={`invoices/${invoice.id}`} className="p-4 block">
-                                        <Badge className="rounded-full bg-slate-600">
+                                        <Badge className={cn(
+                                            "rounded-full capitalize",
+                                            invoice.status === "open" && "bg-blue-500 text-white",
+                                            invoice.status === "paid" && "bg-green-600 text-white",
+                                            invoice.status === "void" && "bg-zinc-700 text-white",
+                                            invoice.status === "uncollectible" && "bg-red-500 text-white",
+                                        )}>
                                             {invoice.status}
                                         </Badge>
                                     </Link>
