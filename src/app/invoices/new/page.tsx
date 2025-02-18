@@ -8,6 +8,7 @@ import Form from "next/form";
 
 import { createAction } from "@/app/actions";
 import { SyntheticEvent, useState } from "react";
+import Container from "@/components/Container";
 
 
 export default function New() {
@@ -21,34 +22,36 @@ export default function New() {
     }
 
     return (
-        <main className="flex flex-col justify-center text-left gap-6 max-w-5xl mx-auto my-12">
-            <div className="flex justify-between  w-full">
-                <h1 className="text-3xl font-semibold">
-                    Create Invoice
-                </h1>
-            </div>
+        <main className="h-full">
+            <Container>
+                <div className="flex justify-between mb-6">
+                    <h1 className="text-3xl font-semibold">
+                        Create Invoice
+                    </h1>
+                </div>
 
-            <Form action={createAction} onSubmit={handleSubmit} className="grid gap-6 max-w-xs">
-                <div>
-                    <Label htmlFor="name" className="block font-semibold text-small mb-2 ">Billing Name</Label>
-                    <Input id="name" name="name" type="text" />
-                </div>
-                <div>
-                    <Label htmlFor="email" className="block font-semibold text-small mb-2">Billing Email</Label>
-                    <Input id="email" name="email" type="email" />
-                </div>
-                <div>
-                    <Label htmlFor="value" className="block font-semibold text-small mb-2">Value</Label>
-                    <Input id="value" name="value" type="text" />
-                </div>
-                <div>
-                    <Label htmlFor="description" className="block font-semibold text-small mb-2">Description</Label>
-                    <Textarea id="description" name="description"/>
-                </div>
-                <div>
-                    <SubmitButton />
-                </div>
-            </Form>
+                <Form action={createAction} onSubmit={handleSubmit} className="grid gap-6 max-w-xs">
+                    <div>
+                        <Label htmlFor="name" className="block font-semibold text-small mb-2 ">Billing Name</Label>
+                        <Input id="name" name="name" type="text" />
+                    </div>
+                    <div>
+                        <Label htmlFor="email" className="block font-semibold text-small mb-2">Billing Email</Label>
+                        <Input id="email" name="email" type="email" />
+                    </div>
+                    <div>
+                        <Label htmlFor="value" className="block font-semibold text-small mb-2">Value</Label>
+                        <Input id="value" name="value" type="text" />
+                    </div>
+                    <div>
+                        <Label htmlFor="description" className="block font-semibold text-small mb-2">Description</Label>
+                        <Textarea id="description" name="description"/>
+                    </div>
+                    <div>
+                        <SubmitButton />
+                    </div>
+                </Form>
+            </Container>
         </main>
     );
 }
