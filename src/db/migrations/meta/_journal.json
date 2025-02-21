@@ -8,6 +8,13 @@
       "when": 1738943346996,
       "tag": "0000_flippant_doctor_faustus",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1740112618739,
+      "tag": "0001_gigantic_warlock",
+      "breakpoints": true
     }
   ]
 }

@@ -15,9 +15,13 @@ import { db } from "@/db";
 import { Invoices } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import Container from "@/components/Container";
+import { auth } from "@clerk/nextjs/server";
+import { eq } from "drizzle-orm";
 
 export default async function Dashboard() {
-    const invoices = await db.select().from(Invoices);
+    const {userId, redirectToSignIn} = await auth();
+    if (!userId) return redirectToSignIn();;   
+    const invoices = await db.select().from(Invoices).where(eq(Invoices.userId, userId));
     return (
         <main className="h-full">
             <Container>

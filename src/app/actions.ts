@@ -3,14 +3,19 @@
 import { redirect } from "next/navigation";
 import { db } from "@/db/index";
 import { Invoices } from "@/db/schema";
+import { auth } from "@clerk/nextjs/server";
 
 export const createAction = async(formData: FormData) =>{
+    const { userId, redirectToSignIn } = await auth()
+    if (!userId) return redirectToSignIn();
+
     const value = Math.floor(parseFloat(String(formData.get('value'))) * 100);
     const description = formData.get('description') as string ;
 
     const result = await db.insert(Invoices).values({
         value,
         description,
+        userId,
         status: "open",
     })
     .returning({
