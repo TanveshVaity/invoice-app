@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { db } from "@/db/index";
-import { Invoices } from "@/db/schema";
+import { Customers, Invoices } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq , and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -13,11 +13,22 @@ export const createAction = async(formData: FormData) =>{
 
     const value = Math.floor(parseFloat(String(formData.get('value'))) * 100);
     const description = formData.get('description') as string ;
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string; 
+
+    const [ customer ] = await db.insert(Customers).values({
+        name,
+        email,
+        userId
+    }).returning({
+        id : Customers.id,
+    })
 
     const result = await db.insert(Invoices).values({
         value,
         description,
         userId,
+        customerId: customer.id,
         status: "open",
     })
     .returning({

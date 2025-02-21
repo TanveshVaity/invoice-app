@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { Invoices } from "@/db/schema";
+import { Customers, Invoices } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
@@ -13,10 +13,13 @@ export default async function InvoicePage({ params } : {params: {invoiceId : str
         return new Error("Unauthorized");
     }
 
-    const [ invoice ]= await db.select()
+    const [ result ]= await db.select()
     .from(Invoices)
+    .innerJoin(Customers, eq(Invoices.customerId, Customers.id))
     .where(
-        and(eq(Invoices.id, Number(invoiceId)), eq(Invoices.userId, userId))
+        and(eq(Invoices.id, Number(invoiceId)),
+            eq(Invoices.userId, userId)
+        )
     )
     .limit(1);
 
@@ -24,8 +27,13 @@ export default async function InvoicePage({ params } : {params: {invoiceId : str
         return new Error("Invalid Invoice ID");
     }
 
-    if (!invoice) {
+    if (!result) {
         return notFound();
+    }
+
+    const invoice = {
+        ...result.invoices,
+        customer: result.customers
     }
 
     return (

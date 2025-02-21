@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { CirclePlus } from 'lucide-react';
 import Link from "next/link";
 import { db } from "@/db";
-import { Invoices } from "@/db/schema";
+import { Customers, Invoices } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import Container from "@/components/Container";
 import { auth } from "@clerk/nextjs/server";
@@ -20,8 +20,20 @@ import { eq } from "drizzle-orm";
 
 export default async function Dashboard() {
     const {userId, redirectToSignIn} = await auth();
-    if (!userId) return redirectToSignIn();;   
-    const invoices = await db.select().from(Invoices).where(eq(Invoices.userId, userId));
+    if (!userId) return redirectToSignIn();
+
+    const invoices = await db.select()
+    .from(Invoices)
+    .innerJoin(Customers, eq(Invoices.customerId, Customers.id))
+    .where(eq(Invoices.userId, userId));
+
+    const invoice = invoices?.map(({invoices, customers}) => {
+        return {
+            ...invoices,
+            customer: customers
+        }
+    });
+
     return (
         <main className="h-full">
             <Container>
@@ -59,7 +71,7 @@ export default async function Dashboard() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {invoices.map(invoice =>{
+                        {invoice.map(invoice =>{
                             return (
                                 <TableRow key={invoice.id}>
                                     <TableCell className="text-left p-0">
@@ -69,12 +81,12 @@ export default async function Dashboard() {
                                     </TableCell>
                                     <TableCell className="text-left p-0">
                                         <Link href={`invoices/${invoice.id}`} className="p-4 block font-semibold">
-                                            tan
+                                            {invoice.customer.name}
                                         </Link>
                                     </TableCell>
                                     <TableCell className="text-left p-0">
                                         <Link href={`invoices/${invoice.id}`} className="p-4 block">
-                                            tan@planetexpress.com
+                                            {invoice.customer.email}
                                         </Link>
                                     </TableCell>
                                     <TableCell className="text-center p-0">
