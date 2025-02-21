@@ -9,13 +9,22 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
 import { AvailableStatus } from "@/data/status";
-import { handleStatus } from "@/app/actions";
-import { ChevronDown } from 'lucide-react';
+import { deleteInvoice, handleStatus } from "@/app/actions";
+import { ChevronDown, Ellipsis, Trash2 } from 'lucide-react';
 import { useOptimistic } from 'react';
-
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+  
 
 interface InvoiceProps {
     invoice: typeof Invoices.$inferSelect;
@@ -53,28 +62,67 @@ export default function Invoice({invoice} : InvoiceProps) {
                             {currentStatus}
                         </Badge>
                     </h1>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button className="flex items-center" variant="outline">
-                                Change Status 
-                                <ChevronDown className="w-4 h-auto "/> 
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            {AvailableStatus.map((status) => (
-                                <DropdownMenuItem key={status.id}>
-                                    <form action={handleUpdateStatus}>
-                                        <input type="hidden" name="id" value={invoice.id} />
-                                        <input type="hidden" name="status" value={status.id} />
-                                        <button>
-                                            {status.label}
-                                        </button>
-                                    </form>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
+                    <div className="flex gap-4">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button className="flex items-center" variant="outline">
+                                    Change Status 
+                                    <ChevronDown className="w-4 h-auto "/> 
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                {AvailableStatus.map((status) => (
+                                    <DropdownMenuItem key={status.id}>
+                                        <form action={handleUpdateStatus}>
+                                            <input type="hidden" name="id" value={invoice.id} />
+                                            <input type="hidden" name="status" value={status.id} />
+                                            <button>
+                                                {status.label}
+                                            </button>
+                                        </form>
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        
+                        <Dialog>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button className="flex items-center" variant="outline">
+                                        <span className="sr-only">More Options</span>
+                                        <Ellipsis className="w-4 h-auto "/>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem>
+                                        <DialogTrigger asChild>
+                                            <button className="flex items-center gap-2">
+                                                <Trash2 className="w-4 h-auto"/>
+                                                Delete Invoice
+                                            </button>
+                                        </DialogTrigger>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            <DialogContent>
+                                <DialogHeader className="gap-4">
+                                    <DialogTitle className="text-2xl">Delete Invoice?</DialogTitle>
+                                    <DialogDescription>
+                                        This action cannot be undone. This will permanently delete your invoice
+                                    </DialogDescription>
+                                    <DialogFooter>
+                                        <form className="flex justify-center w-full" action={deleteInvoice}>
+                                            <input type="hidden" name="id" value={invoice.id} />
+                                            <Button variant="destructive" className="flex items-center gap-2">
+                                                <Trash2 className="w-4 h-auto"/>
+                                                Delete Invoice
+                                            </Button>
+                                        </form>
+                                    </DialogFooter>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                 </div>
 
                 <p className="text-3xl mb-3">

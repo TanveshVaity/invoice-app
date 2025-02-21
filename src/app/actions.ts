@@ -48,3 +48,20 @@ export const handleStatus = async (formData : FormData) => {
     revalidatePath(`/invoices/${id}`, "page");
     // redirect(`/invoices/${id}`);
 }
+
+export const deleteInvoice = async (formData : FormData) => {
+    const id = formData.get('id') as string;
+    const { userId, redirectToSignIn } = await auth(); 
+    if (!userId) return redirectToSignIn();
+
+    const result = await db.delete(Invoices)
+    .where(
+        and(
+            eq(Invoices.id, Number(id)),
+            eq(Invoices.userId, userId),
+        )
+    )
+
+    redirect(`/dashboard`);
+
+}
