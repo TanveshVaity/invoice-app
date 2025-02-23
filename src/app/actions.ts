@@ -8,7 +8,7 @@ import { eq , and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export const createAction = async(formData: FormData) =>{
-    const { userId, redirectToSignIn } = await auth()
+    const { userId, redirectToSignIn, orgId } = await auth();
     if (!userId) return redirectToSignIn();
 
     const value = Math.floor(parseFloat(String(formData.get('value'))) * 100);
@@ -19,7 +19,8 @@ export const createAction = async(formData: FormData) =>{
     const [ customer ] = await db.insert(Customers).values({
         name,
         email,
-        userId
+        userId,
+        organizationID: orgId || null,
     }).returning({
         id : Customers.id,
     })
@@ -30,6 +31,7 @@ export const createAction = async(formData: FormData) =>{
         userId,
         customerId: customer.id,
         status: "open",
+        organizationID: orgId || null,
     })
     .returning({
         id : Invoices.id,
