@@ -16,16 +16,30 @@ import { Customers, Invoices } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import Container from "@/components/Container";
 import { auth } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 export default async function Dashboard() {
-    const {userId, redirectToSignIn} = await auth();
+    const {userId, redirectToSignIn, orgId} = await auth();
     if (!userId) return redirectToSignIn();
 
-    const invoices = await db.select()
-    .from(Invoices)
-    .innerJoin(Customers, eq(Invoices.customerId, Customers.id))
-    .where(eq(Invoices.userId, userId));
+    let invoices;
+    if(orgId){
+        invoices = await db.select()
+        .from(Invoices)
+        .innerJoin(Customers, eq(Invoices.customerId, Customers.id))
+        .where(eq(Invoices.organizationID, orgId));
+    }
+    else{
+        invoices = await db.select()
+        .from(Invoices)
+        .innerJoin(Customers, eq(Invoices.customerId, Customers.id))
+        .where(
+            and(
+                eq(Invoices.userId, userId),
+                isNull(Invoices.organizationID)
+            )
+        );
+    }
 
     const invoice = invoices?.map(({invoices, customers}) => {
         return {

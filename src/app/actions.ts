@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db/index";
 import { Customers, Invoices } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { eq , and } from "drizzle-orm";
+import { eq , and, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export const createAction = async(formData: FormData) =>{
@@ -41,22 +41,38 @@ export const createAction = async(formData: FormData) =>{
 }
 
 export const handleStatus = async (formData : FormData) => {
-    const { userId, redirectToSignIn } = await auth()
+    const { userId, redirectToSignIn, orgId} = await auth()
     if (!userId) return redirectToSignIn();
 
     const id  = formData.get('id') as string;
     const status = formData.get('status') as string;
 
-    const result = await db.update(Invoices)
-    .set({
-        status
-    })
-    .where(
-        and(
-            eq(Invoices.id, Number(id)),
-            eq(Invoices.userId, userId),
+    let result;
+    if(orgId){
+        result = await db.update(Invoices)
+        .set({
+            status
+        })
+        .where(
+            and(
+                eq(Invoices.id, Number(id)),
+                eq(Invoices.organizationID, orgId),
+            )
         )
-    )
+    }
+    else{
+        result = await db.update(Invoices)
+        .set({
+            status
+        })
+        .where(
+            and(
+                eq(Invoices.id, Number(id)),
+                eq(Invoices.userId, userId),
+                isNull(Invoices.organizationID)
+            )
+        )
+    }
 
     revalidatePath(`/invoices/${id}`, "page");
     // redirect(`/invoices/${id}`);
@@ -64,16 +80,29 @@ export const handleStatus = async (formData : FormData) => {
 
 export const deleteInvoice = async (formData : FormData) => {
     const id = formData.get('id') as string;
-    const { userId, redirectToSignIn } = await auth(); 
+    const { userId, redirectToSignIn, orgId } = await auth(); 
     if (!userId) return redirectToSignIn();
 
-    const result = await db.delete(Invoices)
-    .where(
-        and(
-            eq(Invoices.id, Number(id)),
-            eq(Invoices.userId, userId),
+    let result;
+    if(orgId){
+        result = await db.delete(Invoices)
+        .where(
+            and(
+                eq(Invoices.id, Number(id)),
+                eq(Invoices.organizationID, orgId),
+            )
         )
-    )
+    }
+    else{
+        result = await db.delete(Invoices)
+        .where(
+            and(
+                eq(Invoices.id, Number(id)),
+                eq(Invoices.userId, userId),
+                isNull(Invoices.organizationID)
+            )
+        )
+    }
 
     redirect(`/dashboard`);
 
